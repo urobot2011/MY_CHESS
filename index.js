@@ -1,4 +1,4 @@
-const BOARD_IDX = 120;
+const BOARD_IDX = 144;
 
 // 화이트의 피스들
 const W_P = 1;
@@ -9,46 +9,75 @@ const W_Q = 5;
 const W_K = 6;
 
 // 블랙의 피스들
-const B_P = -W_P;
-const B_R = -W_R;
-const B_B = -W_B;
-const B_N = -W_N;
-const B_Q = -W_Q;
-const B_K = -W_K;
+const B_P = 7;
+const B_R = 8;
+const B_B = 9;
+const B_N = 10;
+const B_Q = 11;
+const B_K = 12;
 
 const RAND = 100; // 패딩
 const EMPTY = 0; // 빈 칸
 
+const VAR_TYPE_int = 99; // int 타입
+
+const NO_CAPTURE = 0;
+const CAPTURE = 1;
+const ENPASSANT_CAPTURE = 2;
+
 // 나머지 상수
-const A8 = 21, B8 = 22, C8 = 23, D8 = 24, E8 = 25, F8 = 26, G8 = 27, H8 = 28,
-	A7 = 31, B7 = 32, C7 = 33, D7 = 34, E7 = 35, F7 = 36, G7 = 37, H7 = 38,
-	A2 = 81, B2 = 82, C2 = 83, D2 = 84, E2 = 85, F2 = 86, G2 = 87, H2 = 88,
-	A1 = 91, B1 = 92, C1 = 93, D1 = 94, E1 = 95, F1 = 96, G1 = 97, H1 = 98;
+const A1 = 110, B1 = 111, C1 = 112, D1 = 113, E1 = 114, F1 = 115, G1 = 116, H1 = 117,
+	A8 = 26, B8 = 27, C8 = 28, D8 = 29, E8 = 30, F8 = 31, G8 = 32, H8 = 33;
 
-const WHITE_PROMOTES = [A8, B8, C8, D8, E8, F8, G8, H8];
-const BLACK_PROMOTES = [A1, B1, C1, D1, E1, F1, G1, H1];
+const BOARD_START_IDX = A8, BOARD_END_IDX = H1+1;
 
-const WHITE_NEAR_PROMOTES = [A7, B7, C7, D7, E7, F7, G7, H7];
-const BLACK_NEAR_PROMOTES = [A2, B2, C2, D2, E2, F2, G2, H2];
+const RANKS = [
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 0,
+	0, 0, 7, 7, 7, 7, 7, 7, 7, 7, 0, 0,
+	0, 0, 6, 6, 6, 6, 6, 6, 6, 6, 0, 0,
+	0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0,
+	0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0,
+	0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0,
+	0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0,
+	0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+];
 
-const WHITE_PAWN = [A2, B2, C2, D2, E2, F2, G2, H2];
-const BLACK_PAWN = [A7, B7, C7, D7, E7, F7, G7, H7];
+const FILES = [
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 0,
+	0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 0,
+	0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 0,
+	0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 0,
+	0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 0,
+	0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 0,
+	0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 0,
+	0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+];
 
 // 보드의 기본 위치
 const InitialPosition = [
-	RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND,
-	RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND,
-	RAND, B_R, B_N, B_B, B_Q, B_K, B_B, B_N, B_R, RAND,
-	RAND, B_P, B_P, B_P, B_P, B_P, B_P, B_P, B_P, RAND,
-	RAND, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, RAND,
-	RAND, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, RAND,
-	RAND, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, RAND,
-	RAND, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, RAND,
-	RAND, W_P, W_P, W_P, W_P, W_P, W_P, W_P, W_P, RAND,
-	RAND, W_R, W_N, W_B, W_Q, W_K, W_B, W_N, W_R, RAND,
-	RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND,
-	RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND
+	RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND,
+	RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND,
+	RAND, RAND, B_R, B_N, B_B, B_Q, B_K, B_B, B_N, B_R, RAND, RAND,
+	RAND, RAND, B_P, B_P, B_P, B_P, B_P, B_P, B_P, B_P, RAND, RAND,
+	RAND, RAND, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, RAND, RAND,
+	RAND, RAND, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, RAND, RAND,
+	RAND, RAND, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, RAND, RAND,
+	RAND, RAND, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, RAND, RAND,
+	RAND, RAND, W_P, W_P, W_P, W_P, W_P, W_P, W_P, W_P, RAND, RAND,
+	RAND, RAND, W_R, W_N, W_B, W_Q, W_K, W_B, W_N, W_R, RAND, RAND,
+	RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND,
+	RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND
 ];
+
+const MAX_HISTORYS = 300;
 
 // 보드
 let board = InitialPosition;
@@ -58,670 +87,836 @@ let game = {};
 
 game.turn = 1;
 game.enPassant = EMPTY;
+game.enPassantPiece = EMPTY;
 game.castlings = [true, true, true, true];
 game.kingLocations = [E1, E8];
 
-game.undos = [];
+game.undos = new Array(MAX_HISTORYS);
+
+game.undos_pointer = 0;
 
 // Move 인코딩
 class Move {
-	constructor(from, to, flags, isCapture) {
-		this.move = (from & 0xFF) | ((to & 0xFF) << 8) | ((Math.abs(flags) & 0xFF) << 16) | (((isCapture ? 1 : 0) & 0xFF) << 32);
+	constructor(from, to, capture = NO_CAPTURE, castling = EMPTY, pawn2Move = EMPTY, flag = EMPTY){
+		this.move = from | (to << 7) | (+capture << 14) | (castling << 16) | (pawn2Move << 23) | flag;
 	}
 	getFrom(){
-		return this.move & 0xFF;
+		return this.move & 0x7F;
 	}
 	getTo(){
-		return (this.move >> 8) & 0xFF;
+		return (this.move >> 7) & 0x7F;
+	}
+	getCapture(){
+		return (this.move >> 14) & 0x3;
+	}
+	getCastling(){
+		return (this.move >> 16) & 0x7F;
+	}
+	getPawn2Move(){
+		return (this.move >> 23) & 0x7F;
 	}
 	getFlags(){
-		return (this.move >> 12) & 0xFF;
-	}
-	isCapture(){
-		return ((this.move >> 32) & 1) === 1;
-	}
-	isCastling(){
-		let rook;
-		return [(
-			this.getFrom() === E8 && (
-				(this.getTo() === G8 && (rook = new Move(H8, F8, 0, false))) ||
-				(this.getTo() === C8 && (rook = new Move(A8, D8, 0, false)))
-			) ||
-			this.getFrom() === E1 && (
-				(this.getTo() === G1 && (rook = new Move(H1, F1, 0, false))) ||
-				(this.getTo() === C1 && (rook = new Move(A1, D1, 0, false)))
-			)
-		), rook];
-	}
-	is2Square(){
-		return Math.abs(this.getTo() - this.getFrom()) === 20;
-	}
-}
+        return this.move >>> 30; 
+    }
 
-// Undo 인코딩
-class Undo {
-	constructor(){}
-	save(){
-		this.board = board;
-		this.enPassant = game.enPassant;
-		this.castlings = game.castlings;
-		this.kingLocations = game.kingLocations;
-		game.undos.push(this);
+	isCastling(){
+		return this.getCastling() !== EMPTY;
 	}
-	undo(){
-		let state = game.undos.pop();
-		
-		board = state.board;
-		game.enPassant = state.enPassant;
-		game.castlings = state.castlings;
-		game.kingLocations = state.kingLocations;
+	isPawn2Move(){
+		return this.getPawn2Move() !== EMPTY;
+	}
+	isPromoted(){
+		return this.getFlags() !== EMPTY;
 	}
 }
 
 // 툴
 function pieceMapper(piece){
-	const pieceMapping = {
-		'P': W_P, 'R': W_R, 'N': W_N, 'B': W_B, 'Q': W_Q, 'K': W_K,
-		'p': B_P, 'r': B_R, 'n': B_N, 'b': B_B, 'q': B_Q, 'k': B_K 
-	};
-	return pieceMapping[piece];
-}
-
-function pieceReverseMapper(piece){
-	const reverseMapping = {
+	const mapping = {
 		[W_P]: 'P', [W_R]: 'R', [W_N]: 'N', [W_B]: 'B', [W_Q]: 'Q', [W_K]: 'K',
 		[B_P]: 'p', [B_R]: 'r', [B_N]: 'n', [B_B]: 'b', [B_Q]: 'q', [B_K]: 'k'
 	};
-	return reverseMapping[piece] || '';
+	return mapping[piece] || '';
+}
+
+function pieceReverseMapper(piece){
+	const mapping = {
+		'P': W_P, 'R': W_R, 'N': W_N, 'B': W_B, 'Q': W_Q, 'K': W_K,
+		'p': B_P, 'r': B_R, 'n': B_N, 'b': B_B, 'q': B_Q, 'k': B_K 
+	};
+	return mapping[piece];
 }
 
 function pieceColor(piece){
-	return Math.abs(piece) === piece;
+	return +(piece < B_P);
 }
 
 function squareMapper(idx){
-	const range = [];
-	for(let i = 21; i <= 91; i += 10){
-		range.push(i);
-	}
+	let column = String.fromCharCode(96 + FILES[idx]);  
 
-	const mapping = {
-		1: 'a',
-		2: 'b',
-		3: 'c',
-		4: 'd',
-		5: 'e',
-		6: 'f',
-		7: 'g',
-		8: 'h',
-	};
+	let row = RANKS[idx];
 
-	let pair = '';
-	for(let i = 0; i < range.length; i++){
-		if(idx >= range[i] && idx <= range[i] + 7){
-			pair = mapping[i + 1] + (idx - range[i] + 1);
-			break;
-		}
-	}
-
-	return pair;
+	return `${column}${row}`;
 }
 
 function squareReverseMapper(sq){
-	return 8 * (sq[0].charCodeAt(0) - 97) + (parseInt(sq[1], 10) - 1);
+	return 25 + (8 - sq[1]) * 12 + (sq.charCodeAt(0) - 96);
 }
 
 function loadKingLocations(){
-	for(let i = 0; i < 64; i++){
-		if(board[21+i] === W_K) game.kingLocations[0] = i;
-		else if(board[21+i] === B_K) game.kingLocations[1] = i;
+	for(let i = BOARD_START_IDX; i < BOARD_END_IDX; i++){
+		if(board[i] === RAND){
+			i++;
+			continue;
+		}
+
+		if(board[i] === W_K) game.kingLocations[0] = i;
+		else if(board[i] === B_K) game.kingLocations[1] = i;
 	}
 }
 
-// 가능한 모든 움직임
-function GenerateWhitePieceMoves(idx){
+function saveBoard(){
+	let state = new Object();
+	state.board = [...board];
+	state.enPassant = game.enPassant;
+	state.enPassantPiece = game.enPassantPiece;
+	state.castlings = [...game.castlings];
+	state.kingLocations = [...game.kingLocations];
+
+	game.undos[game.undos_pointer] = state;
+
+	game.undos_pointer++;
+}
+
+function TakeMove(){
+	game.undos_pointer--;
+
+	let state = game.undos[game.undos_pointer];
+	
+	board = state.board;
+	game.enPassant = state.enPassant;
+	game.enPassantPiece = state.enPassantPiece;
+	game.castlings = state.castlings;
+	game.kingLocations = state.kingLocations;
+
+	game.turn = game.turn ^ 1;
+}
+
+// 공격 당하고 있는지
+function isAttacked(from, color){
+	let pawn = B_P, rook = B_R, bishop = B_B, knight = B_N, queen = B_Q, king = B_K;
+
+	let pawnCapturePositionLeft = -11;
+	let pawnCapturePositionRight = -22;
+
+	if(color === 0){
+		pawn = W_P, rook = W_R, bishop = W_B, knight = W_N, queen = W_Q, king = W_K;
+
+		pawnCapturePositionLeft = 11;
+		pawnCapturePositionRight = 22;
+	}
+
+	{ // Pawn
+		if(board[from + pawnCapturePositionLeft] === pawn) return 1;
+		if(board[from + pawnCapturePositionRight] === pawn) return 1;
+	}
+
+	{ // Knight
+		if(board[from + 10] === knight) return 1;
+		if(board[from - 10] === knight) return 1;
+		if(board[from + 23] === knight) return 1;
+		if(board[from - 23] === knight) return 1;
+		if(board[from + 14] === knight) return 1;
+		if(board[from - 14] === knight) return 1;
+		if(board[from + 25] === knight) return 1;
+		if(board[from - 25] === knight) return 1;
+	}
+
+	let sq = VAR_TYPE_int;
+
+	{ // Queen and rook and bishop
+		{ // Queen and rook
+			sq = from;
+			while(board[sq] !== RAND){
+				sq += 1;
+				if(board[sq] === queen || board[sq] === rook) return 1;
+				else if(board[sq] !== EMPTY) break;
+			} 
+
+			sq = from;
+			while(board[sq] !== RAND){
+				sq -= 1;
+				if(board[sq] === queen || board[sq] === rook) return 1;
+				else if(board[sq] !== EMPTY) break;
+			} 
+
+			sq = from;
+			while(board[sq] !== RAND){
+				sq += 12;
+				if(board[sq] === queen || board[sq] === rook) return 1;
+				else if(board[sq] !== EMPTY) break;
+			} 
+
+			sq = from;
+			while(board[sq] !== RAND){
+				sq -= 12;
+				if(board[sq] === queen || board[sq] === rook) return 1;
+				else if(board[sq] !== EMPTY) break;
+			} 
+		}
+		
+		{ // Queen and bishop
+			sq = from;
+			while(board[sq] !== RAND){
+				sq += 11;
+				if(board[sq] === queen || board[sq] === bishop) return 1;
+				else if(board[sq] !== EMPTY) break;
+			} 
+
+			sq = from;
+			while(board[sq] !== RAND){
+				sq -= 11;
+				if(board[sq] === queen || board[sq] === bishop) return 1;
+				else if(board[sq] !== EMPTY) break;
+			} 
+
+			sq = from;
+			while(board[sq] !== RAND){
+				sq += 13;
+				if(board[sq] === queen || board[sq] === bishop) return 1;
+				else if(board[sq] !== EMPTY) break;
+			} 
+
+			sq = from;
+			while(board[sq] !== RAND){
+				sq -= 13;
+				if(board[sq] === queen || board[sq] === bishop) return 1;
+				else if(board[sq] !== EMPTY) break;
+			} 
+		}
+	}
+
+	{ // King
+		if(board[from + 11] === king) return 1;
+		if(board[from - 11] === king) return 1;
+		if(board[from + 13] === king) return 1;
+		if(board[from - 13] === king) return 1;
+		if(board[from + 12] === king) return 1;
+		if(board[from - 12] === king) return 1;
+		if(board[from + 1] === king) return 1;
+		if(board[from - 1] === king) return 1;
+	}
+
+	return 0;
+}
+
+// 가능한 모든 움직임(상대가 체크 가능 수 포함)
+function GenerateMoves(){
 	let moves = [];
-	switch(board[idx]){
-		case W_P: { // 폰
-			if(WHITE_NEAR_PROMOTES.includes(idx)){
-				let promoteSq;
-				let isCapture = true;
+	let movesPos = 0;
+
+	let pawn = W_P, rook = W_R, bishop = W_B, knight = W_N, queen = W_Q, king = W_K;
+
+	let pawnMovePosition = -12;
+	let pawn2MovePosition = -24;
+	let pawnCapturePositionLeft = -11;
+	let pawnCapturePositionRight = -22;
+
+	let pawn2MoveRank = 2;
+
+	let pawnPromotionRank = 8;
+
+	let sq = VAR_TYPE_int;
+
+	if(game.turn === 0){
+		pawn = B_P, rook = B_R, bishop = B_B, knight = B_N, queen = B_Q, king = B_K;
+
+		pawnMovePosition = 12;
+		pawn2MovePosition = 24;
+		pawnCapturePositionLeft = 11;
+		pawnCapturePositionRight = 22;
+
+		pawn2MoveRank = 7;
+
+		pawnPromotionRank = 1;
+
+		if(
+			game.castlings[2] && 
+			board[G8] === EMPTY && 
+			board[F8] === EMPTY &&  
+			!isAttacked(E8, 0) && 
+			!isAttacked(G8, 0) && 
+			!isAttacked(F8, 0)
+		){
+			moves[movesPos++] = new Move(E8, G8, false, H8 | (F8 >> 7));
+		}
+		if(
+			game.castlings[3] && 
+			board[D8] === EMPTY && 
+			board[C8] === EMPTY && 
+			board[B8] === EMPTY &&  
+			!isAttacked(E8, 0) && 
+			!isAttacked(D8, 0) && 
+			!isAttacked(C8, 0) && 
+			!isAttacked(B8, 0)
+		){
+			moves[movesPos++] = new Move(E8, C8, false, A8 | (D8 >> 7));
+		}
+
+	} else {
+		if(
+			game.castlings[0] && 
+			board[G8] === EMPTY && 
+			board[F8] === EMPTY && 
+			!isAttacked(E1, 1) && 
+			!isAttacked(G1, 1) && 
+			!isAttacked(F1, 1)
+		){
+			moves[movesPos++] = new Move(E1, G1, false, H1 | (F1 >> 7));
+		}
+		if(
+			game.castlings[1] && 
+			board[D1] === EMPTY && 
+			board[C1] === EMPTY && 
+			board[B1] === EMPTY &&  
+			!isAttacked(E1, 1) && 
+			!isAttacked(D1, 1) && 
+			!isAttacked(C1, 1) && 
+			!isAttacked(B1, 1)
+		){
+			moves[movesPos++] = new Move(E1, C1, false, A1 | (D1 >> 7));
+		}
+	}
+
+	for(let i = BOARD_START_IDX; i < BOARD_END_IDX; i++){
+		if(board[i] === RAND || board[i] === EMPTY) continue;
+
+		if(board[i] === pawn){ // Pawn
+			if(RANKS[i + pawnMovePosition] === pawnPromotionRank && board[i + pawnMovePosition] === EMPTY){
+				moves[movesPos++] = new Move(i, i + pawnMovePosition, NO_CAPTURE, EMPTY, EMPTY, rook);
+				moves[movesPos++] = new Move(i, i + pawnMovePosition, NO_CAPTURE, EMPTY, EMPTY, bishop);
+				moves[movesPos++] = new Move(i, i + pawnMovePosition, NO_CAPTURE, EMPTY, EMPTY, knight);
+				moves[movesPos++] = new Move(i, i + pawnMovePosition, NO_CAPTURE, EMPTY, EMPTY, queen);
+
 				if(
-					(
-						board[idx - 10] === EMPTY && 
-						(promoteSq = idx - 10) &&
-						(isCapture = false)
-					) || (
-						board[idx - 9] !== RAND && board[idx - 9] !== EMPTY && 
-						!pieceColor(board[idx - 9]) &&  
-						(promoteSq = idx - 9)
-					) || (
-						board[idx - 11] !== RAND && board[idx - 11] !== EMPTY &&
-						!pieceColor(board[idx - 11]) &&
-						(promoteSq = idx - 11)
-					)
+					board[i + pawnCapturePositionLeft] !== RAND && 
+					board[i + pawnCapturePositionLeft] !== EMPTY &&
+					pieceColor(board[i + pawnCapturePositionLeft]) !== game.turn
 				){
-					moves.push(new Move(idx, promoteSq, W_Q, isCapture));
-					moves.push(new Move(idx, promoteSq, W_N, isCapture));
-					moves.push(new Move(idx, promoteSq, W_R, isCapture));
-					moves.push(new Move(idx, promoteSq, W_B, isCapture));
+					moves[movesPos++] = new Move(i, i + pawnCapturePositionLeft, CAPTURE, EMPTY, EMPTY, rook);
+					moves[movesPos++] = new Move(i, i + pawnCapturePositionLeft, CAPTURE, EMPTY, EMPTY, bishop);
+					moves[movesPos++] = new Move(i, i + pawnCapturePositionLeft, CAPTURE, EMPTY, EMPTY, knight);
+					moves[movesPos++] = new Move(i, i + pawnCapturePositionLeft, CAPTURE, EMPTY, EMPTY, queen);
 				}
-			} else {
-				if(board[idx - 10] === EMPTY){
-					moves.push(new Move(idx, idx - 10, 0, false));
-					if(WHITE_PAWN.includes(idx)){
-						if(board[idx - 20] === EMPTY){
-							moves.push(new Move(idx, idx - 20, 0, false));
-						}
-					}
-					let captureSq;
-					if(
-						(
-							board[idx - 9] !== RAND && (
-								(board[idx - 9] !== EMPTY && !pieceColor(board[idx - 9])) || 
-							(
-								game.enPassant !== EMPTY && (idx - 9) === game.enPassant
-							)) && 
-							(captureSq = idx - 9)
-						) || (
-							board[idx - 11] !== RAND && (
-								(board[idx - 11] !== EMPTY && !pieceColor(board[idx - 11])) || 
-							(
-								game.enPassant !== EMPTY && (idx - 11) === game.enPassant
-							)) && 
-							(captureSq = idx - 11)
-						)
-					){
-						moves.push(new Move(idx, captureSq, 0, true));
-					}
-				}
-			}
-			break;
-		}
-		case W_R: { // 룩
-			let sq = board[idx];
-			[+1, -1, +0.1, -0.1].forEach(element => {
-				rook: for(let i = 10; i < 80; i+=10){
-					sq = board[idx + (i*element)];
-					if(sq === RAND) break rook;
-					if(sq !== EMPTY){
-						if(!pieceColor(sq)){
-							moves.push(new Move(idx, idx + i, 0, true));
-						}
-						break rook;
-					}
-					moves.push(new Move(idx, idx + i, 0, false));
-				}
-			});
-			break;
-		}
-		case W_B: { // 비숍
-			let sq = board[idx];
-			[+9, +11, -11, -9].forEach(element => {
-				bishop: for(let i = 1; i < 8; i++){
-					sq = board[idx + (i*element)];
-					if(sq === RAND) break bishop;
-					if(sq !== EMPTY){
-						if(!pieceColor(sq)){
-							moves.push(new Move(idx, idx + i, 0, true));
-						}
-						break bishop;
-					}
-					moves.push(new Move(idx, idx + i, 0, false));
-				}
-			});
-			break;
-		}
-		case W_N: { // 나이트
-			const knightMoves = [
-				-21, -19, -12, -8,
-				8, 12, 19, 21
-			];
-
-			for(let i = 0; i < knightMoves.length; i++){
-				let sq = board[idx + knightMoves[i]];
-
-				if(sq === RAND) continue;
-				if(sq === EMPTY || !pieceColor(sq)){
-					moves.push(new Move(idx, idx + knightMoves[i], 0, sq !== EMPTY));
-				}
-			}
-			break;
-		}
-		case W_Q: { // 퀸
-			let sq = board[idx];
-			[+1, -1, +0.1, -0.1, +0.9, +0.11, -0.11, -0.9].forEach(element => {
-				queen: for(let i = 10; i < 80; i+=10){
-					sq = board[idx + (i*element)];
-					if(sq === RAND) break queen;
-					if(sq !== EMPTY){
-						if(!pieceColor(sq)){
-							moves.push(new Move(idx, idx + i, 0, true));
-						}
-						break queen;
-					}
-					moves.push(new Move(idx, idx + i, 0, false));
-				}
-			});
-			break;
-		}
-		case W_K: { // 킹
-			const kingMoves = [+10, -10, +1, -1, +9, +11, -11, -9];
-
-			for(let i = 0; i < kingMoves.length; i++){
-				let sq = board[idx + kingMoves[i]];
-
-				if(sq === RAND) continue;
-				if(sq === EMPTY || !pieceColor(sq)){
-					moves.push(new Move(idx, idx + kingMoves[i], 0, sq !== EMPTY));
-				}
-			}
-			break;
-		}
-	}
-	return moves;
-}
-
-function GenerateBlackPieceMoves(idx){
-	let moves = [];
-	switch(board[idx]){
-		case B_P: { // 폰
-			if(BLACK_NEAR_PROMOTES.includes(idx)){
-				let promiteSq;
-				let isCapture = true;
 				if(
-					(
-						board[idx + 10] === EMPTY && 
-						(promiteSq = idx + 10) &&
-						(isCapture = false)
-					) || (
-						board[idx + 9] !== RAND && board[idx + 9] !== EMPTY && 
-						pieceColor(board[idx + 9]) &&  
-						(promiteSq = idx + 9)
-					) || (
-						board[idx + 11] !== RAND && board[idx + 11] !== EMPTY &&
-						pieceColor(board[idx + 11]) &&
-						(promiteSq = idx + 11)
-					)
+					board[i + pawnCapturePositionRight] !== RAND && 
+					board[i + pawnCapturePositionRight] !== EMPTY &&
+					pieceColor(board[i + pawnCapturePositionRight]) !== game.turn
 				){
-					moves.push(new Move(idx, promiteSq, B_Q, isCapture));
-					moves.push(new Move(idx, promiteSq, B_N, isCapture));
-					moves.push(new Move(idx, promiteSq, B_R, isCapture));
-					moves.push(new Move(idx, promiteSq, B_B, isCapture));
+					moves[movesPos++] = new Move(i, i + pawnCapturePositionRight, CAPTURE, EMPTY, EMPTY, rook);
+					moves[movesPos++] = new Move(i, i + pawnCapturePositionRight, CAPTURE, EMPTY, EMPTY, bishop);
+					moves[movesPos++] = new Move(i, i + pawnCapturePositionRight, CAPTURE, EMPTY, EMPTY, knight);
+					moves[movesPos++] = new Move(i, i + pawnCapturePositionRight, CAPTURE, EMPTY, EMPTY, queen);
 				}
-			} else {
-				if(board[idx + 10] === EMPTY){
-					moves.push(new Move(idx, idx + 10, 0, false));
-					if(BLACK_PAWN.includes(idx)){
-						if(board[idx + 20] === EMPTY){
-							moves.push(new Move(idx, idx + 20, 0, false));
-						}
-					}
-					let captureSq;
-					if(
-						(
-							board[idx + 9] !== RAND && (
-								(board[idx + 9] !== EMPTY && pieceColor(board[idx + 9])) || 
-							(
-								game.enPassant !== EMPTY && (idx + 9) === game.enPassant
-							)) && 
-							(captureSq = idx + 9)
-						) || (
-							board[idx + 11] !== RAND && (
-								(board[idx + 11] !== EMPTY && pieceColor(board[idx + 9])) || 
-							(
-								game.enPassant !== EMPTY && (idx + 11) === game.enPassant
-							)) && 
-							(captureSq = idx + 11)
-						)
-					){
-						moves.push(new Move(idx, captureSq, 0, true));
-					}
+
+				continue;
+			}
+
+			if(board[i + pawnMovePosition] === EMPTY){
+				moves[movesPos++] = new Move(i, i + pawnMovePosition);
+				if(RANKS[i] === pawn2MoveRank && board[i + pawn2MovePosition] === EMPTY){
+					moves[movesPos++] = new Move(i, i + pawn2MovePosition, NO_CAPTURE, EMPTY, i + pawnMovePosition);
 				}
 			}
-			break;
-		}
-		case B_R: { // 룩
-			let sq = board[idx];
-			[+1, -1, +0.1, -0.1].forEach(element => {
-				rook: for(let i = 10; i < 80; i+=10){
-					sq = board[idx + (i*element)];
-					if(sq === RAND) break rook;
-					if(sq !== EMPTY){
-						if(pieceColor(sq)){
-							moves.push(new Move(idx, idx + i, 0, true));
-						}
-						break rook;
-					}
-					moves.push(new Move(idx, idx + i, 0, false));
-				}
-			});
-			break;
-		}
-		case B_B: { // 비숍
-			let sq = board[idx];
-			[+9, +11, -11, -9].forEach(element => {
-				bishop: for(let i = 1; i < 8; i++){
-					sq = board[idx + (i*element)];
-					if(sq === RAND) break bishop;
-					if(sq !== EMPTY){
-						if(pieceColor(sq)){
-							moves.push(new Move(idx, idx + i, 0, true));
-						}
-						break bishop;
-					}
-					moves.push(new Move(idx, idx + i, 0, false));
-				}
-			});
-			break;
-		}
-		case B_N: { // 나이트 
-			const knightMoves = [
-				-21, -19, -12, -8,
-				8, 12, 19, 21
-			];
 
-			for(let i = 0; i < knightMoves.length; i++){
-				let sq = board[idx + knightMoves[i]];
+			if(
+				board[i + pawnCapturePositionLeft] !== RAND && 
+				board[i + pawnCapturePositionLeft] !== EMPTY &&
+				pieceColor(board[i + pawnCapturePositionLeft]) !== game.turn
+			) moves[movesPos++] = new Move(i, i + pawnCapturePositionLeft, CAPTURE);
+			
+			if(
+				board[i + pawnCapturePositionRight] !== RAND && 
+				board[i + pawnCapturePositionRight] !== EMPTY &&
+				pieceColor(board[i + pawnCapturePositionRight]) !== game.turn
+			) moves[movesPos++] = new Move(i, i + pawnCapturePositionRight, CAPTURE);
 
-				if(sq === RAND) continue;
-				if(sq === EMPTY || pieceColor(sq)){
-					moves.push(new Move(idx, idx + knightMoves[i], 0, sq !== EMPTY));
+			if(game.enPassant !== EMPTY){
+				if(game.enPassant === i + pawnCapturePositionLeft){
+					moves[movesPos++] = new Move(i, i + pawnCapturePositionLeft, ENPASSANT_CAPTURE);
+				}
+				if(game.enPassant === i + pawnCapturePositionRight){
+					moves[movesPos++] = new Move(i, i + pawnCapturePositionRight, ENPASSANT_CAPTURE);
 				}
 			}
-			break;
+
+			continue;
 		}
-		case B_Q: { // 퀸
-			let sq = board[idx];
-			[+1, -1, +0.1, -0.1, +0.9, +0.11, -0.11, -0.9].forEach(element => {
-				queen: for(let i = 10; i < 80; i+=10){
-					sq = board[idx + (i*element)];
-					if(sq === RAND) break queen;
-					if(sq !== EMPTY){
-						if(pieceColor(sq)){
-							moves.push(new Move(idx, idx + i, 0, true));
-						}
-						break queen;
+
+		if(board[i] === rook){ // Rook
+			sq = i + 1;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
 					}
-					moves.push(new Move(idx, idx + i, 0, false));
+					break;
 				}
-			});
-			break;
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq += 1;
+			} 
+
+			sq = i - 1;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
+				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq -= 1;
+			} 
+
+			sq = i + 12;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
+				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq += 12;
+			} 
+
+			sq = i - 12;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
+				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq -= 12;
+			} 
 		}
-		case B_K: { // 킹
-			const kingMoves = [+10, -10, +1, -1, +9, +11, -11, -9];
 
-			for(let i = 0; i < kingMoves.length; i++){
-				let sq = board[idx + kingMoves[i]];
-
-				if(sq === RAND) continue;
-				if(sq === EMPTY || pieceColor(sq)){
-					moves.push(new Move(idx, idx + kingMoves[i], 0, sq !== EMPTY));
+		if(board[i] === bishop){ // Bishop
+			sq = i + 11;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
 				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq += 11;
+			} 
+
+			sq = i - 11;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
+				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq -= 11;
+			} 
+
+			sq = i + 13;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
+				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq += 13;
+			} 
+
+			sq = i - 13;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
+				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq -= 13;
+			} 
+		}
+
+		if(board[i] === knight){ // Knight
+			if(board[i + 10] !== RAND){
+				if(board[i + 10] === EMPTY || (board[i + 10] !== EMPTY && pieceColor(board[i + 10]) !== game.turn)) moves[movesPos++] = new Move(i, i + 10, board[i + 10] !== EMPTY);
 			}
-			break;
+			if(board[i - 10] !== RAND){
+				if(board[i - 10] === EMPTY || (board[i - 10] !== EMPTY && pieceColor(board[i - 10]) !== game.turn)) moves[movesPos++] = new Move(i, i - 10, board[i - 10] !== EMPTY);
+			}
+			if(board[i + 23] !== RAND){
+				if(board[i + 23] === EMPTY || (board[i + 23] !== EMPTY && pieceColor(board[i + 23]) !== game.turn)) moves[movesPos++] = new Move(i, i + 23, board[i + 23] !== EMPTY);
+			}
+			if(board[i - 23] !== RAND){
+				if(board[i - 23] === EMPTY || (board[i - 23] !== EMPTY && pieceColor(board[i - 23]) !== game.turn)) moves[movesPos++] = new Move(i, i - 23, board[i - 23] !== EMPTY);
+			}
+			if(board[i + 14] !== RAND){
+				if(board[i + 14] === EMPTY || (board[i + 14] !== EMPTY && pieceColor(board[i + 14]) !== game.turn)) moves[movesPos++] = new Move(i, i + 14, board[i + 14] !== EMPTY);
+			}
+			if(board[i - 14] !== RAND){
+				if(board[i - 14] === EMPTY || (board[i - 14] !== EMPTY && pieceColor(board[i - 14]) !== game.turn)) moves[movesPos++] = new Move(i, i - 14, board[i - 14] !== EMPTY);
+			}
+			if(board[i + 25] !== RAND){
+				if(board[i + 25] === EMPTY || (board[i + 25] !== EMPTY && pieceColor(board[i + 25]) !== game.turn)) moves[movesPos++] = new Move(i, i + 25, board[i + 25] !== EMPTY);
+			}
+			if(board[i - 25] !== RAND){
+				if(board[i - 25] === EMPTY || (board[i - 25] !== EMPTY && pieceColor(board[i - 25]) !== game.turn)) moves[movesPos++] = new Move(i, i - 25, board[i - 25] !== EMPTY);
+			}
+
+			continue;
+		}
+	
+		if(board[i] === queen){ // Queen
+			sq = i + 1;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
+				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq += 1;
+			} 
+
+			sq = i - 1;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
+				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq -= 1;
+			} 
+
+			sq = i + 12;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
+				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq += 12;
+			} 
+
+			sq = i - 12;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
+				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq -= 12;
+			} 
+
+			sq = i + 11;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
+				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq += 11;
+			} 
+
+			sq = i - 11;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
+				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq -= 11;
+			} 
+
+			sq = i + 13;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
+				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq += 13;
+			} 
+
+			sq = i - 13;
+			while(board[sq] !== RAND){
+				if(board[sq] !== EMPTY){
+					if(pieceColor(board[sq]) !== game.turn){
+						moves[movesPos++] = new Move(i, sq, CAPTURE);
+					}
+					break;
+				}
+				moves[movesPos++] = new Move(i, sq, NO_CAPTURE);
+				sq -= 13;
+			} 
+		}
+
+		if(board[i] === knight){ // King
+			if(board[i + 11] !== RAND){
+				if(board[i + 11] === EMPTY || (board[i + 11] !== EMPTY && pieceColor(board[i + 11]) !== game.turn)) moves[movesPos++] = new Move(i, i + 11, board[i + 11] !== EMPTY);
+			}
+			if(board[i - 11] !== RAND){
+				if(board[i - 11] === EMPTY || (board[i - 11] !== EMPTY && pieceColor(board[i - 11]) !== game.turn)) moves[movesPos++] = new Move(i, i - 11, board[i - 11] !== EMPTY);
+			}
+			if(board[i + 13] !== RAND){
+				if(board[i + 13] === EMPTY || (board[i + 13] !== EMPTY && pieceColor(board[i + 13]) !== game.turn)) moves[movesPos++] = new Move(i, i + 13, board[i + 13] !== EMPTY);
+			}
+			if(board[i - 13] !== RAND){
+				if(board[i - 13] === EMPTY || (board[i - 13] !== EMPTY && pieceColor(board[i - 13]) !== game.turn)) moves[movesPos++] = new Move(i, i - 13, board[i - 13] !== EMPTY);
+			}
+			if(board[i + 12] !== RAND){
+				if(board[i + 12] === EMPTY || (board[i + 12] !== EMPTY && pieceColor(board[i + 12]) !== game.turn)) moves[movesPos++] = new Move(i, i + 12, board[i + 12] !== EMPTY);
+			}
+			if(board[i - 12] !== RAND){
+				if(board[i - 12] === EMPTY || (board[i - 12] !== EMPTY && pieceColor(board[i - 12]) !== game.turn)) moves[movesPos++] = new Move(i, i - 12, board[i - 12] !== EMPTY);
+			}
+			if(board[i + 1] !== RAND){
+				if(board[i + 1] === EMPTY || (board[i + 1] !== EMPTY && pieceColor(board[i + 1]) !== game.turn)) moves[movesPos++] = new Move(i, i + 1, board[i + 1] !== EMPTY);
+			}
+			if(board[i - 1] !== RAND){
+				if(board[i - 1] === EMPTY || (board[i - 1] !== EMPTY && pieceColor(board[i - 1]) !== game.turn)) moves[movesPos++] = new Move(i, i - 1, board[i - 1] !== EMPTY);
+			}
+			
+			continue;
 		}
 	}
+
 	return moves;
 }
 
-// 공격이 가능한지
-function isWhiteAttacked(sq){
-	const blackPieces = [B_P, B_R, B_B, B_N, B_Q, B_K];
-	const piece = board[sq];
+// 움직임
+function MakeMove(move){
+	saveBoard();
 
-	for(let pieceType of blackPieces){
-		board[sq] = pieceType;
+	let pawn = W_P, rook = W_R, king = W_K;
 
-		const moves = GenerateBlackPieceMoves(sq);
-		for(let move of moves){
-			if(board[move.getTo()] !== RAND && !pieceColor(board[move.getTo()])){
-				board[sq] = piece;
-				return true;
-			}
-		}
+	if(game.turn === 0){
+		pawn = B_P, rook = B_R, king = B_K;
 	}
 
-	board[sq] = piece;
-	return false;
-}
-
-function isBlackAttacked(sq){
-	const whitePieces = [W_P, W_R, W_B, W_N, W_Q, W_K];
-	const piece = board[sq];
-
-	for(let pieceType of whitePieces){
-		board[sq] = pieceType;
-
-		const moves = GenerateWhitePieceMoves(sq);
-		for(let move of moves){
-			if(board[move.getTo()] !== RAND && pieceColor(board[move.getTo()])){
-				board[sq] = piece;
-				return true;
-			}
-		}
-	}
-
-	board[sq] = piece;
-	return false;
-}
-
-// 화이트의 모든 움직임(상대가 체크 가능 수 포함)
-function GenerateWhiteMoves(){
-	let moves = [];
-	if(
-		game.castlings[0] && 
-		board[G8] === EMPTY && 
-		board[F8] === EMPTY && 
-		!isBlackAttacked(G1) && 
-		!isBlackAttacked(F1)
-	){
-		moves.push(new Move(E1, G1, 0, false));
-	}
-	if(
-		game.castlings[1] && 
-		board[D1] === EMPTY && 
-		board[C1] === EMPTY && 
-		board[B1] === EMPTY && 
-		!isBlackAttacked(D1) && 
-		!isBlackAttacked(C1) && 
-		!isBlackAttacked(B1)
-	){
-		moves.push(new Move(E1, C1, 0, false));
-	}
-	for(let i = 0; i < 99; i++){
-		if(board[21+i] === RAND || board[21+i] === EMPTY) continue;
-		if(pieceColor(board[21+i])){
-			let pieceMoves = GenerateWhitePieceMoves(21+i);
-			moves.push(...pieceMoves);
-		}
-	}
-	return moves;
-}
-
-// 블랙의 모든 움직임(상대가 체크 가능 수 포함)
-function GenerateBlackMoves(){
-	let moves = [];
-	if(
-		game.castlings[2] && 
-		board[G8] === EMPTY && 
-		board[F8] === EMPTY && 
-		!isWhiteAttacked(G8) && 
-		!isWhiteAttacked(F8)
-	){
-		moves.push(new Move(E8, G8, 0, false));
-	}
-	if(
-		game.castlings[3] && 
-		board[D8] === EMPTY && 
-		board[C8] === EMPTY && 
-		board[B8] === EMPTY && 
-		!isWhiteAttacked(D8) && 
-		!isWhiteAttacked(C8) && 
-		!isWhiteAttacked(B8)
-	){
-		moves.push(new Move(E8, C8, 0, false));
-	}
-	for(let i = 0; i < 99; i++){
-		if(board[21+i] === RAND || board[21+i] === EMPTY) continue;
-		if(!pieceColor(board[21+i])){
-			let pieceMoves = GenerateBlackPieceMoves(21+i);
-			moves.push(...pieceMoves);
-		}
-	}
-	return moves;
-}
-
-// 텀에 맞게 모든 움직임 생성
-function GenerateAllMoves(){
-	return game.turn ? GenerateWhiteMoves() : GenerateBlackMoves()
-}
-
-// 움직임 생성
-function MakeWhiteMove(move){
 	let from = move.getFrom();
 	let to = move.getTo();
-	let castling = move.isCastling();
+	let capture = move.getCapture();
+	let castling = move.getCastling();
 	let flag = move.getFlags();
-	console.log(squareMapper(from), squareMapper(to));
 
-	if(board[from] === W_K && castling[0]){
-		board[to] = W_K;
+	let piece = board[from];
+
+	if(castling !== EMPTY){
+		board[to] = king;
 		board[from] = EMPTY;
-		board[castling[1].getTo()] = W_R;
-		board[castling[1].getFrom()] = EMPTY;
+		board[castling & 0x7F] = EMPTY;
+		board[(castling >> 7) & 0x7F] = rook;
 	} else if(flag !== EMPTY){
 		board[to] = flag;
 		board[from] = EMPTY;
-	} else {
-		board[to] = board[from];
+
+		game.enPassant = EMPTY;
+	} else if(capture === ENPASSANT_CAPTURE){
+		board[to] = piece;
+		board[game.enPassantPiece] = EMPTY;
 		board[from] = EMPTY;
-		if(board[to] === W_P && move.is2Square()){
-			game.enPassant = to - 10;
+
+		game.enPassant = EMPTY;
+	} else {
+		board[to] = piece;
+		board[from] = EMPTY;
+
+		game.enPassant = EMPTY;
+
+		if(piece === pawn && move.isPawn2Move()){
+			game.enPassant = move.getPawn2Move();
+			game.enPassantPiece = to;
+		} else if(piece === king){
+			if(game.turn === 1){
+				game.kingLocations[0] = to;
+				game.castlings[0] = false;
+				game.castlings[1] = false;
+			} else {
+				game.kingLocations[1] = to;
+				game.castlings[2] = false;
+				game.castlings[3] = false;
+			}
+		} else if(piece === rook){
+			if(game.turn === 1){
+				if(from === A1){
+					game.castlings[0] = false;
+				} else if(from === H1){
+					game.castlings[1] = false;
+				}
+			} else {
+				if(from === A8){
+					game.castlings[2] = false;
+				} else if(from === H8){
+					game.castlings[3] = false;
+				}
+			}
 		}
 	}
 
-	new Undo().save();
-}
+	game.turn = game.turn ^ 1;
 
-function MakeBlackMove(move){
-	let from = move.getFrom();
-	let to = move.getTo();
-	let castling = move.isCastling();
-	let flag = move.getFlags();
+	if(isAttacked(game.kingLocations[+game.turn], +!game.turn)){
+		TakeMove();
 
-	if(castling[0]){
-		board[to] = B_K;
-		board[from] = EMPTY;
-		board[castling[1].getTo()] = B_R;
-		board[castling[1].getFrom()] = EMPTY;
-	} else if(flag !== EMPTY){
-		board[to] = flag;
-		board[from] = EMPTY;
-	} else {
-		board[to] = board[from];
-		board[from] = EMPTY;
-		if(board[to] === B_P && move.is2Square()){
-			game.enPassant = to + 10;
-		}
+		return false;
 	}
 
-	new Undo().save();
+	return true;
 }
 
 // FEN
-function fenToMailbox(fen){
+function loadFEN(fen){
 	const [position, turn, castling, enPassant] = fen.split(' ');
-  
+
 	// 메일박스 배열 초기화
-	const mailboxBoard = new Array(BOARD_IDX).fill(EMPTY);
+	board = new Array(BOARD_IDX).fill(EMPTY);
 	const boardRanks = position.split('/');
   
-	let index = 21;
+	let index = A8;
 	boardRanks.forEach(rank => {
 		for(let i = 0; i < rank.length; i++){
 			const symbol = rank[i];
 			if(isNaN(+symbol)){ // 기호가 숫자가 아니면
-				mailboxBoard[index] = pieceMapper(symbol);
+				board[index] = pieceReverseMapper(symbol);
 				index++;
 			} else {
 				index += parseInt(symbol, 10);
 			}
 		}
-		index += 2;
+		index -= 20;
 	});
-  
-	// 패딩 칸 채우기
-	for(let i = 0; i < 10; i++){
-		// 위 칸
-	  	mailboxBoard[i] = RAND;
-		mailboxBoard[10 + i] = RAND;
 
-		// 아래 칸
-		mailboxBoard[100 + i] = RAND;
-	  	mailboxBoard[110 + i] = RAND;
-	}
-	for(let i = 0; i < 100; i = i + 10){
-		// 왼쪽 칸
-		mailboxBoard[20+i] = RAND;
-
-		// 오른쪽 칸
-		mailboxBoard[29+i] = RAND;
-	}
-	
 	game.turn = turn === "w" ? 1 : 0;
-	game.enPassant = enPassant === '-' ? EMPTY : squareReverseMapper(enPassant);
-	loadKingLocations();
 
-	return mailboxBoard;
+	game.castlings[0] = castling.includes('Q');
+	game.castlings[1] = castling.includes('K');
+	game.castlings[2] = castling.includes('q');
+	game.castlings[3] = castling.includes('k');
+
+	if(enPassant !== '-'){
+		game.enPassant = squareReverseMapper(enPassant); 
+		game.enPassantPiece = game.turn ? game.enPassant + 12 : game.enPassant - 12;
+    } else {
+        game.enPassantPiece = EMPTY;
+        game.enPassant = EMPTY;
+    }
+
+	loadKingLocations();
 }
   
-function mailboxToFen(mailboxBoard){
+function getFEN(){
 	let fen = '';
 	let emptySquares = 0;
-  
-	for(let i = 21; i < 99; i++){
-		const piece = mailboxBoard[i];
-	
-		if(piece === RAND){
-			continue; // 경계 칸은 무시
-		}
 
-		if(piece === EMPTY){
+	let rank = 0;
+	let file = 0;
+
+	for(let i = BOARD_START_IDX; i < BOARD_END_IDX; i++){
+		if(board[i] === RAND) continue;
+
+		if(board[i] === EMPTY){
 			emptySquares++;
 		} else {
 			if(emptySquares > 0){
-				fen += emptySquares;
+				fen += emptySquares.toString();
 				emptySquares = 0;
 			}
-			fen += pieceReverseMapper(piece);
+			fen += pieceMapper(board[i]);
 		}
 
-		if(i % 10 === 8){ // 랭크의 끝
+		file++;
+
+		if(file > 7){
+			file = 0;
+			rank++;
+
 			if(emptySquares > 0){
-				fen += emptySquares;
+				fen += emptySquares.toString();
 				emptySquares = 0;
 			}
-			if(i < 98){
-			  	fen += '/';
-			}
-			i += 2; // 경계 칸 건너 뛰기
-		}
-	}
-  
-	fen += " "+(game.turn ? "w" : "b");
 
-	// todo: 여기에 추가적인 FEN 정보(캐슬링, 앙파상 등)를 추가해야 합니다.
-	// 지금은 단순히 피스의 위치만 변환합니다.
+			if(rank < 8) fen += '/';
+		}
+
+	}
+
+	fen += " " + (game.turn ? "w" : "b");
+
+	let castleString = '';
+	if(game.castlings[1]) castleString += 'K';
+	if(game.castlings[0]) castleString += 'Q';
+	if(game.castlings[3]) castleString += 'k';
+	if(game.castlings[2]) castleString += 'q';
+
+	castleString = (castleString === '') ? '-' : castleString;
+
+	fen += " " + castleString;
+
+	let enPassant = game.enPassant === EMPTY ? "-" : squareMapper(game.enPassant);
+
+	fen += " " + enPassant;
 
 	return fen;
 }
 
-const fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-const mailboxBoard = fenToMailbox(fen);
-board = mailboxBoard;
+function printBoard(){
+	let str = '';
+	let line = '';
 
+	let file = 0;
 
+	for(let i = BOARD_START_IDX; i < BOARD_END_IDX; i++){
+		if(board[i] === RAND) continue;
+
+		if(board[i] === EMPTY) line += '.';
+		else line += pieceMapper(board[i]);
+
+		line += ' ';
+
+		file++;
+
+		if(file > 7){
+			file = 0;
+			str += line.trimEnd();
+			str += '\n';
+
+			line = '';
+		}
+	}
+	return str.trimEnd();
+}
+
+/*
 let loop = 100000;
 let startTime = performance.now()
 for(let i = 1; i <= loop; i++){
@@ -729,7 +924,40 @@ for(let i = 1; i <= loop; i++){
 }
 let endTime = performance.now()
 console.log((endTime - startTime)/loop);
-
-GenerateAllMoves().forEach(move => {
+*/
+console.log(getFEN());
+GenerateMoves().forEach(move => {
 	console.log(squareMapper(move.getFrom()), squareMapper(move.getTo()));
-})
+});
+
+console.log(printBoard());
+
+MakeMove(GenerateMoves()[1]);
+console.log(printBoard());
+TakeMove();
+console.log(printBoard());
+
+function Perft(depth){
+	let moveNum = 0;
+
+	if(depth === 1){
+		return GenerateMoves().length;
+  	}
+
+	let moves = GenerateMoves();
+
+	for(let i = 0; i < moves.length; i++){
+		if(!MakeMove(moves[i])) continue;
+		moveNum += Perft(depth-1);
+		TakeMove();
+	}
+
+	return moveNum;
+}
+
+let startTime = performance.now();
+Perft(1);
+let endTime = performance.now();
+console.log(endTime - startTime);
+
+console.log(getFEN());
